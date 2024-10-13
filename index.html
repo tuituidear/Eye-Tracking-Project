@@ -4,88 +4,270 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EyeTracking “Hollywood” Video Clips</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet"> <!-- เพิ่มลิงก์ฟ้อนต์ -->
     <style>
         body {
-            font-family: 'Roboto', sans-serif; /* เปลี่ยนฟ้อนต์เป็น Roboto */
-            display: flex;
-            justify-content: center; /* จัดกึ่งกลางในแนวนอน */
-            flex-direction: column; /* จัดเรียงเนื้อหาในแนวตั้ง */
-            align-items: center; /* จัดกึ่งกลางในแนวนอน */
-            margin: 0;
-            padding-top: 20px; /* เพิ่มระยะห่างด้านบนเพื่อให้เนื้อหาเริ่มจากข้างบน */
-            background-color: #f8f9fa; /* เพิ่มสีพื้นหลังเล็กน้อย */
+            font-family: 'Roboto', sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4; /* สีพื้นหลัง */
         }
         h1 {
-            margin-bottom: 20px; /* เพิ่มช่องไฟด้านล่างระหว่าง h1 กับ genre */
+            text-align: center;
+            color: #333;
         }
-        .genre {
-            margin: 5px;
-            cursor: pointer;
-            padding: 10px;
-            border: 1px solid #ccc;
-            display: inline-block;
+        .video-container {
+            margin: 30px 0; /* เพิ่มระยะห่างระหว่างวิดีโอ */
+            text-align: center;
+            background-color: #fff; /* สีพื้นหลังของวิดีโอ */
+            border-radius: 8px; /* มุมโค้ง */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* เงา */
+            padding: 20px; /* ช่องว่างรอบ ๆ */
         }
-        .selected {
-            background-color: #007BFF;
-            color: white;
+        iframe {
+            width: 40%;
+            height: 400px;
+            border: none;
+            border-radius: 8px; /* มุมโค้ง */
+            margin-top: 20px; /* เพิ่มระยะห่างด้านบนของ iframe */
         }
-        #video-container {
-            display: none; /* ซ่อนวิดีโอเริ่มต้น */
+        .filter {
+            text-align: center;
+            margin-bottom: 30px; /* เพิ่มระยะห่างด้านล่าง */
+            padding: 15px; /* เพิ่มช่องว่างรอบ ๆ */
+            background-color: #0D92F4; /* สีพื้นหลังของการเลือกหนัง */
+            color: white; /* สีตัวอักษร */
+            border-radius: 5px; /* มุมโค้ง */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* เงา */
+            font-size: 1.2em; /* ขนาดตัวอักษรใหญ่ขึ้น */
+        }
+        .score-container {
+            text-align: center;
+            margin-top: 20px; /* เพิ่มระยะห่างด้านบน */
+        }
+        .ratings-title {
             margin-top: 20px;
+            font-size: 1.2em; /* ขนาดตัวอักษรเล็กลง */
+            color: #333;
+        }
+        .scores {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px; /* เพิ่มช่องไฟระหว่างชื่อหมวดหมู่กับคะแนน */
+            margin-bottom: 20px; /* เพิ่มระยะห่างด้านล่าง */
+        }
+        .score {
+            background-color: #0D92F4; /* สีพื้นหลังของคะแนน */
+            color: white; /* สีตัวอักษร */
+            border-radius: 5px; /* มุมโค้ง */
+            padding: 10px 15px; /* ช่องว่างภายใน */
+            margin: 0 15px; /* เพิ่มระยะห่างระหว่างคะแนน */
+            font-weight: bold; /* ตัวหนา */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* เงา */
+        }
+        .file-name {
+            margin-top: 20px; /* เพิ่มระยะห่างจากคะแนน */
+            font-size: 1.5em; /* ขนาดตัวอักษรใหญ่ขึ้น */
+            color: #333; /* สีตัวอักษร */
         }
     </style>
 </head>
 <body>
-    <h1>EyeTracking “Hollywood” Video Clips</h1>
-    <div id="genres"></div>
 
-    <div id="video-container">
-        <h2>วิดีโอ:</h2>
-        <iframe id="video" width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>
+    <h1>EyeTracking “Hollywood” Video Clips</h1>
+
+    <div class="filter">
+        <label for="movieSelect">Choose Movie:</label>
+        <select id="movieSelect" onchange="selectVideo()">
+            <option value="">-- Please select one --</option>
+            <option value="ADVEN">Adventureland</option>
+            <option value="SUND">Any Given Sunday</option>
+            <option value="BIG">Big</option>
+            <option value="BOOKC">Coraline</option>
+            <option value="FOODI">Food, Inc</option>
+            <option value="MULAN">Mulan</option>
+            <option value="RECOUNT">Recount</option>
+            <option value="MARCH">The March of the Penguins</option>
+            <option value="SQUID">The Squid and the Whale</option>
+            <option value="WINGE">Winged Migration</option>
+
+        </select>
+    </div>
+
+    <div id="videoList">
+        <div class="video-container" data-title="ADVEN" style="display:none;">
+            <div class="score-container">
+                <div class="ratings-title">Video Content Ratings by Categories</div>
+                <div class="scores">
+                    <p class="score" id="faceScoreADVEN">Faces: --</p>
+                    <p class="score" id="figureScoreADVEN">Figures: --</p>
+                    <p class="score" id="objectScoreADVEN">Objects: --</p>
+                    <p class="score" id="natureScoreADVEN">Nature: --</p>
+                </div>
+            </div>
+            <div class="file-name">File Name: ADVEN_24a</div>
+            <iframe src="https://drive.google.com/file/d/1vqqjzMxhC4neA5WIN9TYUMj6czH3Daze/preview" allow="autoplay"></iframe>
+        </div>
+
+        <div class="video-container" data-title="BIG" style="display:none;">
+            <div class="score-container">
+                <div class="ratings-title">Video Content Ratings by Categories</div>
+                <div class="scores">
+                    <p class="score" id="faceScoreBIG">Faces: --</p>
+                    <p class="score" id="figureScoreBIG">Figures: --</p>
+                    <p class="score" id="objectScoreBIG">Objects: --</p>
+                    <p class="score" id="natureScoreBIG">Nature: --</p>
+                </div>
+            </div>
+            <div class="file-name">File Name: BIG_9-10a_POR</div>
+            <iframe src="https://drive.google.com/file/d/1IyypNMZy16mqlUItDdT8BqV5jbK_ChyU/preview" allow="autoplay"></iframe>
+        </div>
+
+        <div class="video-container" data-title="SQUID" style="display:none;">
+            <div class="score-container">
+                <div class="ratings-title">Video Content Ratings by Categories</div>
+                <div class="scores">
+                    <p class="score" id="faceScoreSQUID">Faces: --</p>
+                    <p class="score" id="figureScoreSQUID">Figures: --</p>
+                    <p class="score" id="objectScoreSQUID">Objects: --</p>
+                    <p class="score" id="natureScoreSQUID">Nature: --</p>
+                </div>
+            </div>
+            <div class="file-name">File Name: SQUID_12c</div>
+            <iframe src="https://drive.google.com/file/d/1qQrCDE7nSab7SNq6lyXcP9rAd3TJ4Q5r/preview" allow="autoplay"></iframe>
+        </div>
+
+        <div class="video-container" data-title="BOOKC" style="display:none;">
+            <div class="score-container">
+                <div class="ratings-title">Video Content Ratings by Categories</div>
+                <div class="scores">
+                    <p class="score" id="faceScoreBOOKC">Faces: --</p>
+                    <p class="score" id="figureScoreBOOKC">Figures: --</p>
+                    <p class="score" id="objectScoreBOOKC">Objects: --</p>
+                    <p class="score" id="natureScoreBOOKC">Nature: --</p>
+                </div>
+            </div>
+            <div class="file-name">File Name: CORAL_14a</div>
+            <iframe src="https://drive.google.com/file/d/11jEiT1-w-zTF9l2R_QK_dsJLlBsoL9NJ/preview" allow="autoplay"></iframe>
+        </div>
+
+        <div class="video-container" data-title="FOODI" style="display:none;">
+            <div class="score-container">
+                <div class="ratings-title">Video Content Ratings by Categories</div>
+                <div class="scores">
+                    <p class="score" id="faceScoreFOODI">Faces: --</p>
+                    <p class="score" id="figureScoreFOODI">Figures: --</p>
+                    <p class="score" id="objectScoreFOODI">Objects: --</p>
+                    <p class="score" id="natureScoreFOODI">Nature: --</p>
+                </div>
+            </div>
+            <div class="file-name">File Name: FOODI_10a</div>
+            <iframe src="https://drive.google.com/file/d/1HhJ7w1njumGN0Lk77SbqX2EguP-r5Luy/preview" allow="autoplay"></iframe>
+        </div>
+
+        <div class="video-container" data-title="MARCH" style="display:none;">
+            <div class="score-container">
+                <div class="ratings-title">Video Content Ratings by Categories</div>
+                <div class="scores">
+                    <p class="score" id="faceScoreMARCH">Faces: --</p>
+                    <p class="score" id="figureScoreMARCH">Figures: --</p>
+                    <p class="score" id="objectScoreMARCH">Objects: --</p>
+                    <p class="score" id="natureScoreMARCH">Nature: --</p>
+                </div>
+            </div>
+            <div class="file-name">File Name: MARCH_3a</div>
+            <iframe src="https://drive.google.com/file/d/124-qD5uc565Xy2mj5Pq9jnca9jTEF1su/preview" allow="autoplay"></iframe>
+        </div>
+
+        <div class="video-container" data-title="MULAN" style="display:none;">
+            <div class="score-container">
+                <div class="ratings-title">Video Content Ratings by Categories</div>
+                <div class="scores">
+                    <p class="score" id="faceScoreMULAN">Faces: --</p>
+                    <p class="score" id="figureScoreMULAN">Figures: --</p>
+                    <p class="score" id="objectScoreMULAN">Objects: --</p>
+                    <p class="score" id="natureScoreMULAN">Nature: --</p>
+                </div>
+            </div>
+            <div class="file-name">File Name: MULAN_7a</div>
+            <iframe src="https://drive.google.com/file/d/1po2tEK5Hv-oCjWUwKoCkVJLg5QW0gpTh/preview" allow="autoplay"></iframe>
+        </div>
+
+        <div class="video-container" data-title="RECOUNT" style="display:none;">
+            <div class="score-container">
+                <div class="ratings-title">Video Content Ratings by Categories</div>
+                <div class="scores">
+                    <p class="score" id="faceScoreRECOUNT">Faces: --</p>
+                    <p class="score" id="figureScoreRECOUNT">Figures: --</p>
+                    <p class="score" id="objectScoreRECOUNT">Objects: --</p>
+                    <p class="score" id="natureScoreRECOUNT">Nature: --</p>
+                </div>
+            </div>
+            <div class="file-name">File Name: RECOUNT_4b</div>
+            <iframe src="https://drive.google.com/file/d/1146fMP-trLlCeveyTum0VYnSHIJXpQuK/preview" allow="autoplay"></iframe>
+        </div>
+
+        <div class="video-container" data-title="SUND" style="display:none;">
+            <div class="score-container">
+                <div class="ratings-title">Video Content Ratings by Categories</div>
+                <div class="scores">
+                    <p class="score" id="faceScoreSUND">Faces: --</p>
+                    <p class="score" id="figureScoreSUND">Figures: --</p>
+                    <p class="score" id="objectScoreSUND">Objects: --</p>
+                    <p class="score" id="natureScoreSUND">Nature: --</p>
+                </div>
+            </div>
+            <div class="file-name">File Name: SUND_36a_POR</div>
+            <iframe src="https://drive.google.com/file/d/1c-UCDqVrWejpdGBcOCYMfOJpDakIAqNs/preview" allow="autoplay"></iframe>
+        </div>
+
+        <div class="video-container" data-title="WINGE" style="display:none;">
+            <div class="score-container">
+                <div class="ratings-title">Video Content Ratings by Categories</div>
+                <div class="scores">
+                    <p class="score" id="faceScoreWINGE">Faces: --</p>
+                    <p class="score" id="figureScoreWINGE">Figures: --</p>
+                    <p class="score" id="objectScoreWINGE">Objects: --</p>
+                    <p class="score" id="natureScoreWINGE">Nature: --</p>
+                </div>
+            </div>
+            <div class="file-name">File Name: WINGE_18b</div>
+            <iframe src="https://drive.google.com/file/d/110MKE2UKC5WsWLQAK7f06sRyaAdynBkY/preview" allow="autoplay"></iframe>
+        </div>
     </div>
 
     <script>
-        // หมวดหมู่หนัง
-        const genres = ["Action", "Adventure", "Animation", "Biography", "Comedy", "Romance", "Drama"];
+        const scores = {
+            ADVEN: { Faces: 2, Figures: 5, Objects: 2, Nature: 0 },
+            BIG: { Faces: 5, Figures: 5, Objects: 5, Nature: 0 },
+            SQUID: { Faces: 4, Figures: 3, Objects: 2, Nature: 0 },
+            BOOKC: { Faces: 1, Figures: 3, Objects: 4, Nature: 0 },
+            FOODI: { Faces: 0, Figures: 1, Objects: 4, Nature: 3 },
+            MARCH: { Faces: 0, Figures: 0, Objects: 0, Nature: 5 },
+            MULAN: { Faces: 2, Figures: 4, Objects: 2, Nature: 1 },
+            RECOUNT: { Faces: 5, Figures: 3, Objects: 2, Nature: 0},
+            SUND: { Faces: 5, Figures: 5, Objects: 5, Nature: 1},
+            WINGE: { Faces: 0, Figures: 3, Objects: 0, Nature: 4}
+        }; 
 
-        // แสดงหมวดหมู่
-        const genreDivs = d3.select("#genres")
-            .selectAll(".genre")
-            .data(genres)
-            .enter()
-            .append("div")
-            .attr("class", "genre")
-            .text(d => d)
-            .on("click", function(event, d) {
-                // ลบการเลือกจากหมวดหมู่ทั้งหมด
-                d3.selectAll(".genre").classed("selected", false);
-                
-                // เปลี่ยนสถานะการเลือกสำหรับหมวดหมู่ที่ถูกคลิก
-                d3.select(this).classed("selected", true);
-                updateSelectedGenre(); // เรียกฟังก์ชันนี้ทันทีเมื่อมีการเลือก
+        function selectVideo() {
+            const selectedValue = document.getElementById('movieSelect').value;
+            const videos = document.querySelectorAll('.video-container');
+
+            videos.forEach(video => {
+                if (video.getAttribute('data-title') === selectedValue) {
+                    video.style.display = ''; // Show selected video
+
+                    // Update scores for the selected video
+                    const { Faces, Figures, Objects, Nature } = scores[selectedValue];
+                    document.getElementById(`faceScore${selectedValue}`).innerText = `Faces: ${Faces}`;
+                    document.getElementById(`figureScore${selectedValue}`).innerText = `Figures: ${Figures}`;
+                    document.getElementById(`objectScore${selectedValue}`).innerText = `Objects: ${Objects}`;
+                    document.getElementById(`natureScore${selectedValue}`).innerText = `Nature: ${Nature}`;
+                } else {
+                    video.style.display = 'none'; // Hide unselected videos
+                }
             });
-
-        // ฟังก์ชันสำหรับการแสดงวิดีโอ
-        function updateSelectedGenre() {
-            const selectedGenre = d3.selectAll(".genre.selected").text(); // รับค่าหมวดหมู่ที่ถูกเลือก
-
-            // แสดงวิดีโอถ้าหมวดหมู่ "Action" ถูกเลือก
-            if (selectedGenre === "Action") {
-                d3.select("#video").attr("src", "https://drive.google.com/file/d/1VT5dbxLydFBWiUdRRg1MBLCIfXNXAbS5/preview");
-                d3.select("#video-container").style("display", "block"); // แสดงวิดีโอ
-            } 
-            // แสดงวิดีโอถ้าหมวดหมู่ "Comedy" ถูกเลือก
-            else if (selectedGenre === "Comedy") {
-                d3.select("#video").attr("src", "https://drive.google.com/file/d/1wjXkSjtVX5Abc4hTkel287-MuokXmuLE/preview");
-                d3.select("#video-container").style("display", "block"); // แสดงวิดีโอ
-            } 
-            // ซ่อนวิดีโอถ้าหมวดหมู่อื่นถูกเลือก
-            else {
-                d3.select("#video-container").style("display", "none"); // ซ่อนวิดีโอ
-            }
         }
     </script>
+
 </body>
 </html>
