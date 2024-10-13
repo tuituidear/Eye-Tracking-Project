@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EyeTracking “Hollywood” Video Clips</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet"> <!-- เพิ่มลิงก์ฟ้อนต์ -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif; /* เปลี่ยนฟ้อนต์เป็น Roboto */
+            display: flex;
+            justify-content: center; /* จัดกึ่งกลางในแนวนอน */
+            flex-direction: column; /* จัดเรียงเนื้อหาในแนวตั้ง */
+            align-items: center; /* จัดกึ่งกลางในแนวนอน */
+            margin: 0;
+            padding-top: 20px; /* เพิ่มระยะห่างด้านบนเพื่อให้เนื้อหาเริ่มจากข้างบน */
+            background-color: #f8f9fa; /* เพิ่มสีพื้นหลังเล็กน้อย */
+        }
+        h1 {
+            margin-bottom: 20px; /* เพิ่มช่องไฟด้านล่างระหว่าง h1 กับ genre */
+        }
+        .genre {
+            margin: 5px;
+            cursor: pointer;
+            padding: 10px;
+            border: 1px solid #ccc;
+            display: inline-block;
+        }
+        .selected {
+            background-color: #007BFF;
+            color: white;
+        }
+        #video-container {
+            display: none; /* ซ่อนวิดีโอเริ่มต้น */
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>EyeTracking “Hollywood” Video Clips</h1>
+    <div id="genres"></div>
+
+    <div id="video-container">
+        <h2>วิดีโอ:</h2>
+        <iframe id="video" width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>
+    </div>
+
+    <script>
+        // หมวดหมู่หนัง
+        const genres = ["Action", "Adventure", "Animation", "Biography", "Comedy", "Romance", "Drama"];
+
+        // แสดงหมวดหมู่
+        const genreDivs = d3.select("#genres")
+            .selectAll(".genre")
+            .data(genres)
+            .enter()
+            .append("div")
+            .attr("class", "genre")
+            .text(d => d)
+            .on("click", function(event, d) {
+                // ลบการเลือกจากหมวดหมู่ทั้งหมด
+                d3.selectAll(".genre").classed("selected", false);
+                
+                // เปลี่ยนสถานะการเลือกสำหรับหมวดหมู่ที่ถูกคลิก
+                d3.select(this).classed("selected", true);
+                updateSelectedGenre(); // เรียกฟังก์ชันนี้ทันทีเมื่อมีการเลือก
+            });
+
+        // ฟังก์ชันสำหรับการแสดงวิดีโอ
+        function updateSelectedGenre() {
+            const selectedGenre = d3.selectAll(".genre.selected").text(); // รับค่าหมวดหมู่ที่ถูกเลือก
+
+            // แสดงวิดีโอถ้าหมวดหมู่ "Action" ถูกเลือก
+            if (selectedGenre === "Action") {
+                d3.select("#video").attr("src", "https://drive.google.com/file/d/1VT5dbxLydFBWiUdRRg1MBLCIfXNXAbS5/preview");
+                d3.select("#video-container").style("display", "block"); // แสดงวิดีโอ
+            } 
+            // แสดงวิดีโอถ้าหมวดหมู่ "Comedy" ถูกเลือก
+            else if (selectedGenre === "Comedy") {
+                d3.select("#video").attr("src", "https://drive.google.com/file/d/1wjXkSjtVX5Abc4hTkel287-MuokXmuLE/preview");
+                d3.select("#video-container").style("display", "block"); // แสดงวิดีโอ
+            } 
+            // ซ่อนวิดีโอถ้าหมวดหมู่อื่นถูกเลือก
+            else {
+                d3.select("#video-container").style("display", "none"); // ซ่อนวิดีโอ
+            }
+        }
+    </script>
+</body>
+</html>
